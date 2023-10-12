@@ -36,31 +36,31 @@ static bool errata_probe_pbmt(unsigned int stage,
 }
 
 /*
- * th.dcache.ipa rs1 (invalidate, physical address)
+ * dcache.ipa rs1 (invalidate, physical address)
  * | 31 - 25 | 24 - 20 | 19 - 15 | 14 - 12 | 11 - 7 | 6 - 0 |
  *   0000001    01010      rs1       000      00000  0001011
- * th.dcache.iva rs1 (invalidate, virtual address)
+ * dcache.iva rs1 (invalidate, virtual address)
  *   0000001    00110      rs1       000      00000  0001011
  *
- * th.dcache.cpa rs1 (clean, physical address)
+ * dcache.cpa rs1 (clean, physical address)
  * | 31 - 25 | 24 - 20 | 19 - 15 | 14 - 12 | 11 - 7 | 6 - 0 |
  *   0000001    01001      rs1       000      00000  0001011
- * th.dcache.cva rs1 (clean, virtual address)
+ * dcache.cva rs1 (clean, virtual address)
  *   0000001    00101      rs1       000      00000  0001011
  *
- * th.dcache.cipa rs1 (clean then invalidate, physical address)
+ * dcache.cipa rs1 (clean then invalidate, physical address)
  * | 31 - 25 | 24 - 20 | 19 - 15 | 14 - 12 | 11 - 7 | 6 - 0 |
  *   0000001    01011      rs1       000      00000  0001011
- * th.dcache.civa rs1 (clean then invalidate, virtual address)
+ * dcache.civa rs1 (clean then invalidate, virtual address)
  *   0000001    00111      rs1       000      00000  0001011
  *
- * th.sync.s (make sure all cache operations finished)
+ * sync.s (make sure all cache operations finished)
  * | 31 - 25 | 24 - 20 | 19 - 15 | 14 - 12 | 11 - 7 | 6 - 0 |
  *   0000000    11001     00000      000      00000  0001011
  */
-#define THEAD_INVAL_A0	".long 0x02a5000b"
-#define THEAD_CLEAN_A0	".long 0x0295000b"
-#define THEAD_FLUSH_A0	".long 0x02b5000b"
+#define THEAD_inval_A0	".long 0x0265000b"
+#define THEAD_clean_A0	".long 0x0255000b"
+#define THEAD_flush_A0	".long 0x0275000b"
 #define THEAD_SYNC_S	".long 0x0190000b"
 
 #define THEAD_CMO_OP(_op, _start, _size, _cachesize)			\
@@ -79,17 +79,23 @@ asm volatile("mv a0, %1\n\t"						\
 
 static void thead_errata_cache_inv(phys_addr_t paddr, size_t size)
 {
-	THEAD_CMO_OP(INVAL, paddr, size, riscv_cbom_block_size);
+	void *vaddr = phys_to_virt(paddr);
+
+	THEAD_CMO_OP(inval, vaddr, size, riscv_cbom_block_size);
 }
 
 static void thead_errata_cache_wback(phys_addr_t paddr, size_t size)
 {
-	THEAD_CMO_OP(CLEAN, paddr, size, riscv_cbom_block_size);
+	void *vaddr = phys_to_virt(paddr);
+
+	THEAD_CMO_OP(clean, vaddr, size, riscv_cbom_block_size);
 }
 
 static void thead_errata_cache_wback_inv(phys_addr_t paddr, size_t size)
 {
-	THEAD_CMO_OP(FLUSH, paddr, size, riscv_cbom_block_size);
+	void *vaddr = phys_to_virt(paddr);
+
+	THEAD_CMO_OP(flush, vaddr, size, riscv_cbom_block_size);
 }
 
 static const struct riscv_nonstd_cache_ops thead_errata_cmo_ops = {
