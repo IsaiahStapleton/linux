@@ -311,7 +311,7 @@
 			status = "disabled";
 		};
 
-		emmc: mmc@ffe7080000 {
+		mmc0: mmc@ffe7080000 {
 			compatible = "thead,th1520-dwcmshc";
 			reg = <0xff 0xe7080000 0x0 0x10000>;
 			interrupts = <62 IRQ_TYPE_LEVEL_HIGH>;
@@ -320,7 +320,7 @@
 			status = "disabled";
 		};
 
-		sdio0: mmc@ffe7090000 {
+		mmc1: mmc@ffe7090000 {
 			compatible = "thead,th1520-dwcmshc";
 			reg = <0xff 0xe7090000 0x0 0x10000>;
 			interrupts = <64 IRQ_TYPE_LEVEL_HIGH>;
