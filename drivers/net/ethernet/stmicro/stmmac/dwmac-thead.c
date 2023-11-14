@@ -235,7 +235,7 @@ static int thead_dwmac_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, ret,
 				     "failed to get resources\n");
 
-	plat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
+	plat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
 	if (IS_ERR(plat))
 		return dev_err_probe(&pdev->dev, PTR_ERR(plat),
 				     "dt configuration failed\n");
@@ -243,7 +243,7 @@ static int thead_dwmac_probe(struct platform_device *pdev)
 	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
 	if (!dwmac) {
 		ret = -ENOMEM;
-		goto err_remove_config_dt;
+		goto err_exit;
 	}
 
 	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay_ps))
@@ -255,7 +255,7 @@ static int thead_dwmac_probe(struct platform_device *pdev)
 	if (IS_ERR(dwmac->apb_regmap)) {
 		ret = dev_err_probe(&pdev->dev, PTR_ERR(dwmac->apb_regmap),
 				    "Failed to get gmac apb syscon\n");
-		goto err_remove_config_dt;
+		goto err_exit;
 	}
 
 	dwmac->dev = &pdev->dev;
@@ -265,16 +265,16 @@ static int thead_dwmac_probe(struct platform_device *pdev)
 
 	ret = thead_dwmac_init(pdev, plat);
 	if (ret)
-		goto err_remove_config_dt;
+		goto err_exit;
 
 	ret = stmmac_dvr_probe(&pdev->dev, plat, &stmmac_res);
 	if (ret)
-		goto err_remove_config_dt;
+		goto err_exit;
 
 	return 0;
 
-err_remove_config_dt:
-	stmmac_remove_config_dt(pdev, plat);
+err_exit:
+	stmmac_dvr_remove(&pdev->dev);
 
 	return ret;
 }
