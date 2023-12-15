@@ -18893,6 +18893,7 @@ F:	arch/riscv/boot/dts/thead/
 F:	drivers/clk/clk-th1520.c
 F:	drivers/usb/dwc3/dwc3-thead.c
 F:	include/dt-bindings/clock/th1520-clock.h
+F:	drivers/pinctrl/pinctrl-th1520.c
 
 RNBD BLOCK DRIVERS
 M:	Md. Haris Iqbal <haris.iqbal@ionos.com>
