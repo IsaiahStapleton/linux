@@ -487,6 +487,7 @@ struct iommu_ops {
 	struct module *owner;
 	struct iommu_domain *identity_domain;
 	struct iommu_domain *blocked_domain;
+	struct iommu_domain *release_domain;
 	struct iommu_domain *default_domain;
 };
 
@@ -892,11 +893,14 @@ struct iommu_fwspec {
 struct iommu_sva {
 	struct device			*dev;
 	struct iommu_domain		*domain;
+	struct list_head		handle_item;
+	refcount_t			users;
 };
 
 struct iommu_mm_data {
 	u32			pasid;
 	struct list_head	sva_domains;
+	struct list_head	sva_handles;
 };
 
 int iommu_fwspec_init(struct device *dev, struct fwnode_handle *iommu_fwnode,
